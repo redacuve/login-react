@@ -1,12 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import { setUserSession } from '../Utils/Common';
+
+const URL = (email, password) => `http://127.0.0.1:3500/auth/login?email=${email}&password=${password}`;
 
 function Login(props) {
   const { register, handleSubmit, errors } = useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleLogin = () => {
-    props.history.push('/dashboard');
+  const getToken = async (email, password) => {
+    const response = await fetch(URL(email, password), {
+      method: 'POST',
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  const handleLogin = data => {
+    setError(null);
+    setLoading(true);
+    const result = getToken(data.username, data.password);
+    result.then(res => {
+      if (res.auth_token) {
+        setUserSession(res.auth_token, data.username);
+        setLoading(false);
+        props.history.push('/dashboard');
+      } else {
+        setLoading(false);
+        setError(res.message);
+      }
+    });
   };
 
   return (
@@ -60,10 +85,18 @@ function Login(props) {
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
+          disabled={loading}
         >
-          Sign In
+          {loading ? 'Loading...' : 'Sign In'}
         </button>
       </div>
+      {error && (
+        <>
+          <small style={{ color: 'red' }}>{error}</small>
+          <br />
+        </>
+      )}
+      <br />
     </form>
   );
 }
