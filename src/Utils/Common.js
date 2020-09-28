@@ -1,6 +1,8 @@
 export function getUser() {
   const userStr = sessionStorage.getItem('user');
-  if (userStr) return JSON.parse(userStr);
+  if (userStr) {
+    return userStr;
+  }
   return null;
 }
 
@@ -13,7 +15,7 @@ export function removeUserSession() {
   sessionStorage.removeItem('user');
 }
 
-export function setUserSession(user, token) {
+export function setUserSession(token, user) {
   sessionStorage.setItem('token', token);
   sessionStorage.setItem('user', user);
 }
