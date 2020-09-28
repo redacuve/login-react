@@ -1,14 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getUser, removeUserSession } from '../Utils/Common';
 
 function Dashboard(props) {
+  const user = getUser();
+
   const handleLogut = () => {
+    removeUserSession();
     props.history.push('/login');
   };
 
   return (
     <div>
-      Welcome User
+      {`Welcome ${user}`}
       <br />
       <br />
       <button
